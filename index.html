@@ -3,129 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>National Convention Registration</title>
-    
+    <title>Convention Security Scanner</title>
     <link rel="stylesheet" href="style.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        #reader { width: 100%; max-width: 500px; margin: auto; border: none !important; }
+        .scorecard { display: none; padding: 2rem; border-radius: 1.5rem; text-align: center; color: white; margin-top: 1rem; }
+        .bg-success { background-color: #10b981; } /* Green */
+        .bg-error { background-color: #ef4444; }   /* Red */
+        .bg-warning { background-color: #f59e0b; } /* Orange */
+        .detail-box { background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 1rem; margin-top: 1rem; text-align: left; }
+    </style>
 </head>
-<body>
+<body class="bg-gray-900">
 
-    <header>
-        <div class="logo-circle">LOGO</div>
-        <h1>LIVING BY DESIGN NATION</h1>
-        <h2 style="color: #2563eb; font-weight: 600;">National Convention Registration</h2>
-        <p style="color: #6b7280; font-style: italic;">Please Register to secure a seat</p>
-        <div id="dateDisp" style="position: absolute; bottom: 8px; right: 16px; font-size: 0.75rem; color: #9ca3af; font-family: monospace;"></div>
+    <header class="bg-gray-800 text-white p-4 text-center">
+        <h1 class="text-xl font-bold">SECURITY PORTAL</h1>
+        <p class="text-xs text-gray-400">Living By Design National Convention</p>
     </header>
 
-    <main style="max-width: 32rem; margin: 0 auto; padding: 1rem;">
-        
-        <div id="formContainer" class="form-box">
-            <form id="regForm" class="space-y-4">
-                <input type="text" id="fullName" placeholder="Full Name" required>
-                
-                <div class="grid-2">
-                    <input type="email" id="email" placeholder="Email" required>
-                    <input type="tel" id="phone" placeholder="Phone" required>
-                </div>
-                
-                <select id="colony" required>
-                    <option value="">-- Select Colony --</option>
-                    <option>Partnership</option>
-                    <option>Apprenticeship</option>
-                    <option>Relationship</option>
-                    <option>Citizenship</option>
-                    <option>Entrepreneurship</option>
-                    <option>Leadership</option>
-                    <option>Stewardship</option>
-                </select>
-                
-                <div class="grid-2">
-                    <select id="hub" required></select>
-                    <select id="tribe" required></select>
-                </div>
-                
-                <button type="submit" class="btn-pay">PAY TO REGISTER</button>
-            </form>
-        </div>
+    <main class="p-4">
+        <div id="reader" class="rounded-xl overflow-hidden shadow-2xl"></div>
 
-        <div id="loadingScreen" class="hidden" style="text-align: center; padding: 2.5rem;">
-            <div class="loader" style="border-radius: 50%; border: 4px solid #f3f3f3; height: 3rem; width: 3rem; margin: 0 auto 1rem auto;"></div>
-            <p>Processing Payment & Generating Ticket...</p>
-        </div>
-
-        <div id="successCard" class="hidden ticket-card">
-    <h2 style="color: #059669; font-weight: bold; font-size: 1.5rem;">Registration Confirmed!</h2>
-    <p style="color: #6b7280; margin-bottom: 1.5rem;">Please present this ticket at the entrance</p>
-    
-    <div class="id-display">
-        <p style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Your Unique ID</p>
-        <div id="displayID" style="font-size: 1.5rem; font-family: monospace; font-weight: bold; color: #1f2937; margin-bottom: 1rem;">---</div>
-        <svg id="barcode" style="margin: 0 auto;"></svg>
-    </div>
-    
-    <button onclick="window.print()" class="print-btn">
-        <span>🖨️</span> PRINT THIS TICKET
-    </button>
-</div>
+        <div id="resultScorecard" class="scorecard">
+            <div id="statusIcon" class="text-6xl mb-2"></div>
+            <h2 id="statusMessage" class="text-3xl font-black uppercase italic"></h2>
             
-            <button onclick="location.reload()" style="margin-top: 2rem; color: #3b82f6; font-size: 0.875rem; background: none; border: none; cursor: pointer;">Register Another Person</button>
+            <div id="attendeeDetails" class="detail-box">
+                <p class="text-sm opacity-80">Name</p>
+                <p id="resName" class="text-xl font-bold mb-3"></p>
+                
+                <div class="grid-2">
+                    <div>
+                        <p class="text-sm opacity-80">Colony</p>
+                        <p id="resColony" class="font-bold"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm opacity-80">Hub / Tribe</p>
+                        <p id="resHubTribe" class="font-bold"></p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="resetScanner()" class="mt-6 bg-white text-black px-8 py-3 rounded-full font-bold">SCAN NEXT</button>
         </div>
+
+        <div id="loadingText" class="hidden text-white text-center mt-4">Verifying with Database...</div>
     </main>
 
     <script>
-        // --- JAVASCRIPT REMAINS THE SAME AS BEFORE ---
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzA--mA4W4HYHsFDXszrltwU5bgGBa-YWl5R6McyafxaNFDbBQwT65DrRdtML0odkHI/exec";
-        const PAYSTACK_KEY = "pk_test_91f991c422aa16b731c14cfac90911e582c23544";
+        const SCRIPT_URL = "YOUR_WEB_APP_URL"; // Use your same Google Script URL
 
-        document.getElementById('dateDisp').innerText = new Date().toDateString();
+        const html5QrCode = new Html5Qrcode("reader");
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
-        const hSelect = document.getElementById('hub');
-        for(let i=1; i<=31; i++){ hSelect.options.add(new Option(`Hub ${i}`, i)); }
-        const tSelect = document.getElementById('tribe');
-        for(let i=1; i<=72; i++){ tSelect.options.add(new Option(`Tribe ${i}`, i)); }
+        // Start Camera
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
 
-        document.getElementById('regForm').onsubmit = function(e){
-            e.preventDefault();
-            let handler = PaystackPop.setup({
-                key: PAYSTACK_KEY,
-                email: document.getElementById('email').value,
-                amount: 500000, 
-                callback: function(response){
-                    finalizeRegistration(response.reference);
-                }
-            });
-            handler.openIframe();
-        };
+        async function onScanSuccess(decodedText) {
+            // Stop scanning while processing
+            await html5QrCode.pause();
+            
+            document.getElementById('loadingText').classList.remove('hidden');
+            document.getElementById('reader').style.display = 'none';
 
-        async function finalizeRegistration(ref) {
-            document.getElementById('formContainer').classList.add('hidden');
-            document.getElementById('loadingScreen').classList.remove('hidden');
+            try {
+                const response = await fetch(`${SCRIPT_URL}?id=${decodedText}`);
+                const data = await response.json();
+                displayResult(data);
+            } catch (err) {
+                alert("Connection Error. Check Internet.");
+                resetScanner();
+            }
+        }
 
-            const payload = {
-                fullName: document.getElementById('fullName').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                colony: document.getElementById('colony').value,
-                hub: document.getElementById('hub').value,
-                tribe: document.getElementById('tribe').value,
-                paymentRef: ref
-            };
+        function displayResult(data) {
+            document.getElementById('loadingText').classList.add('hidden');
+            const card = document.getElementById('resultScorecard');
+            card.style.display = 'block';
 
-            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            if (data.status === "success") {
+                card.className = "scorecard bg-success";
+                document.getElementById('statusIcon').innerText = "✅";
+                document.getElementById('statusMessage').innerText = "Access Granted";
+                document.getElementById('resName').innerText = data.name;
+                document.getElementById('resColony').innerText = data.colony;
+                document.getElementById('resHubTribe').innerText = `H${data.hub} / T${data.tribe}`;
+                playAudio(true);
+            } 
+            else if (data.status === "already_scanned") {
+                card.className = "scorecard bg-warning";
+                document.getElementById('statusIcon').innerText = "⚠️";
+                document.getElementById('statusMessage').innerText = "Duplicate Scan";
+                document.getElementById('resName').innerText = data.name;
+                document.getElementById('resColony').innerText = "ALREADY CHECKED IN";
+                playAudio(false);
+            } 
+            else {
+                card.className = "scorecard bg-error";
+                document.getElementById('statusIcon').innerText = "❌";
+                document.getElementById('statusMessage').innerText = "Invalid Ticket";
+                document.getElementById('resName').innerText = "Unknown User";
+                playAudio(false);
+            }
+        }
 
-            setTimeout(async () => {
-                const res = await fetch(`${SCRIPT_URL}?getRealID=${ref}`);
-                const result = await res.json();
-                
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('successCard').classList.remove('hidden');
-                document.getElementById('displayID').innerText = result.uniqueID;
-                
-                JsBarcode("#barcode", result.uniqueID, { format: "CODE128", width: 2, height: 60, displayValue: false });
-            }, 3000);
+        function resetScanner() {
+            document.getElementById('resultScorecard').style.display = 'none';
+            document.getElementById('reader').style.display = 'block';
+            html5QrCode.resume();
+        }
+
+        function playAudio(isSuccess) {
+            const freq = isSuccess ? 880 : 220;
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = context.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, context.currentTime);
+            osc.connect(context.destination);
+            osc.start();
+            osc.stop(context.currentTime + 0.2);
         }
     </script>
 </body>
