@@ -96,7 +96,39 @@ input:focus, select:focus {
     border-radius: 0.75rem;
     border: 1px solid #e5e7eb;
 }
+/* Print logic: Hides everything except the ticket when printing */
+@media print {
+    body * { visibility: hidden; }
+    #successCard, #successCard * { visibility: visible; }
+    #successCard { 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 100%; 
+        box-shadow: none; 
+        border: none;
+    }
+    .print-btn { display: none; } /* Hide the button itself on the paper */
+}
 
+/* Print Button Styling */
+.print-btn {
+    margin-top: 2rem;
+    background-color: #10b981; /* green-500 */
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.print-btn:hover {
+    background-color: #059669;
+}
 /* Utilities */
 .hidden { display: none; }
 .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
