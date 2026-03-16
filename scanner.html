@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convention Security Scanner</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        #reader { width: 100%; max-width: 500px; margin: auto; border: none !important; }
+        .scorecard { display: none; padding: 2rem; border-radius: 1.5rem; text-align: center; color: white; margin-top: 1rem; }
+        .bg-success { background-color: #10b981; } /* Green */
+        .bg-error { background-color: #ef4444; }   /* Red */
+        .bg-warning { background-color: #f59e0b; } /* Orange */
+        .detail-box { background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 1rem; margin-top: 1rem; text-align: left; }
+    </style>
+</head>
+<body class="bg-gray-900">
+
+    <header class="bg-gray-800 text-white p-4 text-center">
+        <h1 class="text-xl font-bold">SECURITY PORTAL</h1>
+        <p class="text-xs text-gray-400">Living By Design National Convention</p>
+    </header>
+
+    <main class="p-4">
+        <div id="reader" class="rounded-xl overflow-hidden shadow-2xl"></div>
+
+        <div id="resultScorecard" class="scorecard">
+            <div id="statusIcon" class="text-6xl mb-2"></div>
+            <h2 id="statusMessage" class="text-3xl font-black uppercase italic"></h2>
+            
+            <div id="attendeeDetails" class="detail-box">
+                <p class="text-sm opacity-80">Name</p>
+                <p id="resName" class="text-xl font-bold mb-3"></p>
+                
+                <div class="grid-2">
+                    <div>
+                        <p class="text-sm opacity-80">Colony</p>
+                        <p id="resColony" class="font-bold"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm opacity-80">Hub / Tribe</p>
+                        <p id="resHubTribe" class="font-bold"></p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="resetScanner()" class="mt-6 bg-white text-black px-8 py-3 rounded-full font-bold">SCAN NEXT</button>
+        </div>
+
+        <div id="loadingText" class="hidden text-white text-center mt-4">Verifying with Database...</div>
+    </main>
+
+    <script>
+        const SCRIPT_URL = "YOUR_WEB_APP_URL"; // Use your same Google Script URL
+
+        const html5QrCode = new Html5Qrcode("reader");
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+        // Start Camera
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
+
+        async function onScanSuccess(decodedText) {
+            // Stop scanning while processing
+            await html5QrCode.pause();
+            
+            document.getElementById('loadingText').classList.remove('hidden');
+            document.getElementById('reader').style.display = 'none';
+
+            try {
+                const response = await fetch(`${SCRIPT_URL}?id=${decodedText}`);
+                const data = await response.json();
+                displayResult(data);
+            } catch (err) {
+                alert("Connection Error. Check Internet.");
+                resetScanner();
+            }
+        }
+
+        function displayResult(data) {
+            document.getElementById('loadingText').classList.add('hidden');
+            const card = document.getElementById('resultScorecard');
+            card.style.display = 'block';
+
+            if (data.status === "success") {
+                card.className = "scorecard bg-success";
+                document.getElementById('statusIcon').innerText = "✅";
+                document.getElementById('statusMessage').innerText = "Access Granted";
+                document.getElementById('resName').innerText = data.name;
+                document.getElementById('resColony').innerText = data.colony;
+                document.getElementById('resHubTribe').innerText = `H${data.hub} / T${data.tribe}`;
+                playAudio(true);
+            } 
+            else if (data.status === "already_scanned") {
+                card.className = "scorecard bg-warning";
+                document.getElementById('statusIcon').innerText = "⚠️";
+                document.getElementById('statusMessage').innerText = "Duplicate Scan";
+                document.getElementById('resName').innerText = data.name;
+                document.getElementById('resColony').innerText = "ALREADY CHECKED IN";
+                playAudio(false);
+            } 
+            else {
+                card.className = "scorecard bg-error";
+                document.getElementById('statusIcon').innerText = "❌";
+                document.getElementById('statusMessage').innerText = "Invalid Ticket";
+                document.getElementById('resName').innerText = "Unknown User";
+                playAudio(false);
+            }
+        }
+
+        function resetScanner() {
+            document.getElementById('resultScorecard').style.display = 'none';
+            document.getElementById('reader').style.display = 'block';
+            html5QrCode.resume();
+        }
+
+        function playAudio(isSuccess) {
+            const freq = isSuccess ? 880 : 220;
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = context.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, context.currentTime);
+            osc.connect(context.destination);
+            osc.start();
+            osc.stop(context.currentTime + 0.2);
+        }
+    </script>
+</body>
+</html>
