@@ -1,135 +1,71 @@
-/* Custom Animations */
-.loader { 
-    border-top-color: #3498db; 
-    animation: spin 1s linear infinite; 
-}
-
-@keyframes spin { 
-    0% { transform: rotate(0deg); } 
-    100% { transform: rotate(360deg); } 
-}
-
-/* Base Body Styling */
 body {
-    background-color: #f3f4f6; /* bg-gray-100 */
+    background-color: #f3f4f6;
     min-height: 100vh;
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: sans-serif;
+    margin: 0;
 }
 
-/* Header Adjustments */
 header {
     background-color: white;
     padding: 2rem;
     text-align: center;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     position: relative;
 }
 
 .logo-circle {
-    width: 5rem;
-    height: 5rem;
-    background-color: #dbeafe; /* blue-100 */
-    border-radius: 9999px;
-    margin: 0 auto 1rem auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: #2563eb; /* blue-600 */
+    width: 80px; height: 80px;
+    background-color: #dbeafe;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; color: #2563eb;
 }
 
-/* Form Container */
-.form-box {
-    background-color: white;
+.form-box, .ticket-card {
+    background: white;
     padding: 2rem;
     border-radius: 1rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     margin-top: 1.5rem;
 }
 
-/* Input Fields */
 input, select {
-    width: 100%;
-    border: 1px solid #d1d5db;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    outline: none;
+    width: 100%; border: 1px solid #d1d5db;
+    padding: 0.8rem; border-radius: 0.5rem;
+    margin-bottom: 1rem; box-sizing: border-box;
 }
 
-input:focus, select:focus {
-    border-color: #2563eb;
-    ring: 2px #2563eb;
-}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
-/* Button */
 .btn-pay {
-    width: 100%;
-    background-color: #2563eb;
-    color: white;
-    padding: 1rem;
-    border-radius: 0.75rem;
-    font-weight: bold;
-    font-size: 1.125rem;
-    transition: background-color 0.2s;
-    border: none;
-    cursor: pointer;
+    width: 100%; background: #2563eb; color: white;
+    padding: 1rem; border-radius: 0.8rem;
+    font-weight: bold; border: none; cursor: pointer;
 }
 
-.btn-pay:hover {
-    background-color: #1d4ed8;
+.ticket-card { border-top: 8px solid #10b981; text-align: center; }
+
+.id-display { background: #f9fafb; padding: 1.5rem; border-radius: 0.8rem; border: 1px solid #e5e7eb; }
+
+.print-btn {
+    margin-top: 2rem; background: #10b981; color: white;
+    padding: 0.8rem 1.5rem; border-radius: 0.5rem;
+    font-weight: bold; border: none; cursor: pointer;
 }
 
-/* Ticket Styling */
-.ticket-card {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    margin-top: 1.5rem;
-    text-align: center;
-    border-top: 8px solid #10b981; /* green-500 */
-}
+.hidden { display: none; }
 
-.id-display {
-    background-color: #f9fafb;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    border: 1px solid #e5e7eb;
+.loader {
+    border: 4px solid #f3f3f3; border-top: 4px solid #3498db;
+    border-radius: 50%; width: 40px; height: 40px;
+    animation: spin 1s linear infinite; margin: auto;
 }
-/* Print logic: Hides everything except the ticket when printing */
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
 @media print {
     body * { visibility: hidden; }
     #successCard, #successCard * { visibility: visible; }
-    #successCard { 
-        position: absolute; 
-        left: 0; 
-        top: 0; 
-        width: 100%; 
-        box-shadow: none; 
-        border: none;
-    }
-    .print-btn { display: none; } /* Hide the button itself on the paper */
+    #successCard { position: absolute; left: 0; top: 0; width: 100%; border: none; }
+    .print-btn { display: none; }
 }
-
-/* Print Button Styling */
-.print-btn {
-    margin-top: 2rem;
-    background-color: #10b981; /* green-500 */
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.print-btn:hover {
-    background-color: #059669;
-}
-/* Utilities */
-.hidden { display: none; }
-.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-.space-y-4 > * + * { margin-top: 1rem; }
