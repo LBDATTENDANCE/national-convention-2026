@@ -4,71 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>National Convention Registration</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="style.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://js.paystack.co/v1/inline.js"></script>
-    <style>
-        .loader { border-top-color: #3498db; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body>
 
-    <header class="bg-white p-8 text-center shadow-sm relative">
-        <div class="w-20 h-20 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center font-bold text-blue-600">LOGO</div>
-        <h1 class="text-3xl font-bold">LIVING BY DESIGN NATION</h1>
-        <h2 class="text-xl text-blue-600 font-semibold">National Convention Registration</h2>
-        <p class="text-gray-500 italic">Please Register to secure a seat</p>
-        <div id="dateDisp" class="absolute bottom-2 right-4 text-xs font-mono text-gray-400"></div>
+    <header>
+        <div class="logo-circle">LOGO</div>
+        <h1>LIVING BY DESIGN NATION</h1>
+        <h2 style="color: #2563eb; font-weight: 600;">National Convention Registration</h2>
+        <p style="color: #6b7280; font-style: italic;">Please Register to secure a seat</p>
+        <div id="dateDisp" style="position: absolute; bottom: 8px; right: 16px; font-size: 0.75rem; color: #9ca3af; font-family: monospace;"></div>
     </header>
 
-    <main class="max-w-lg mx-auto p-4">
-        <div id="formContainer" class="bg-white p-8 rounded-2xl shadow-xl mt-6">
+    <main style="max-width: 32rem; margin: 0 auto; padding: 1rem;">
+        
+        <div id="formContainer" class="form-box">
             <form id="regForm" class="space-y-4">
-                <input type="text" id="fullName" placeholder="Full Name" required class="w-full border p-3 rounded-lg">
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="email" id="email" placeholder="Email" required class="w-full border p-3 rounded-lg">
-                    <input type="tel" id="phone" placeholder="Phone" required class="w-full border p-3 rounded-lg">
+                <input type="text" id="fullName" placeholder="Full Name" required>
+                
+                <div class="grid-2">
+                    <input type="email" id="email" placeholder="Email" required>
+                    <input type="tel" id="phone" placeholder="Phone" required>
                 </div>
-                <select id="colony" required class="w-full border p-3 rounded-lg">
+                
+                <select id="colony" required>
                     <option value="">-- Select Colony --</option>
-                    <option>Partnership</option><option>Apprenticeship</option>
-                    <option>Relationship</option><option>Citizenship</option>
-                    <option>Entrepreneurship</option><option>Leadership</option>
+                    <option>Partnership</option>
+                    <option>Apprenticeship</option>
+                    <option>Relationship</option>
+                    <option>Citizenship</option>
+                    <option>Entrepreneurship</option>
+                    <option>Leadership</option>
                     <option>Stewardship</option>
                 </select>
-                <div class="grid grid-cols-2 gap-4">
-                    <select id="hub" required class="border p-3 rounded-lg"></select>
-                    <select id="tribe" required class="border p-3 rounded-lg"></select>
+                
+                <div class="grid-2">
+                    <select id="hub" required></select>
+                    <select id="tribe" required></select>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold text-lg hover:bg-blue-700">PAY TO REGISTER</button>
+                
+                <button type="submit" class="btn-pay">PAY TO REGISTER</button>
             </form>
         </div>
 
-        <div id="loadingScreen" class="hidden text-center p-10">
-            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mx-auto mb-4"></div>
+        <div id="loadingScreen" class="hidden" style="text-align: center; padding: 2.5rem;">
+            <div class="loader" style="border-radius: 50%; border: 4px solid #f3f3f3; height: 3rem; width: 3rem; margin: 0 auto 1rem auto;"></div>
             <p>Processing Payment & Generating Ticket...</p>
         </div>
 
-        <div id="successCard" class="hidden bg-white p-8 rounded-2xl shadow-2xl mt-6 text-center border-t-8 border-green-500">
-            <h2 class="text-2xl font-bold text-green-600">Registration Confirmed!</h2>
-            <p class="text-gray-500 mb-6">Screenshot this for Convention Entry</p>
-            <div class="bg-gray-50 p-6 rounded-xl border">
-                <p class="text-xs text-gray-400 uppercase tracking-widest">Your Unique ID</p>
-                <div id="displayID" class="text-2xl font-mono font-bold text-gray-800 mb-4">---</div>
-                <svg id="barcode" class="mx-auto"></svg>
+        <div id="successCard" class="hidden ticket-card">
+            <h2 style="color: #059669; font-weight: bold; font-size: 1.5rem;">Registration Confirmed!</h2>
+            <p style="color: #6b7280; margin-bottom: 1.5rem;">Screenshot this for Convention Entry</p>
+            
+            <div class="id-display">
+                <p style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Your Unique ID</p>
+                <div id="displayID" style="font-size: 1.5rem; font-family: monospace; font-weight: bold; color: #1f2937; margin-bottom: 1rem;">---</div>
+                <svg id="barcode" style="margin: 0 auto;"></svg>
             </div>
-            <button onclick="location.reload()" class="mt-8 text-blue-500 text-sm font-medium">Register Another Person</button>
+            
+            <button onclick="location.reload()" style="margin-top: 2rem; color: #3b82f6; font-size: 0.875rem; background: none; border: none; cursor: pointer;">Register Another Person</button>
         </div>
     </main>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzA--mA4W4HYHsFDXszrltwU5bgGBa-YWl5R6McyafxaNFDbBQwT65DrRdtML0odkHI/exec";
-        const PAYSTACK_KEY = "pk_test_91f991c422aa16b731c14cfac90911e582c23544";
+        // --- JAVASCRIPT REMAINS THE SAME AS BEFORE ---
+        const SCRIPT_URL = "YOUR_WEB_APP_URL";
+        const PAYSTACK_KEY = "pk_test_YOUR_KEY";
 
         document.getElementById('dateDisp').innerText = new Date().toDateString();
 
-        // Populate Hubs (1-31) and Tribes (1-72)
         const hSelect = document.getElementById('hub');
         for(let i=1; i<=31; i++){ hSelect.options.add(new Option(`Hub ${i}`, i)); }
         const tSelect = document.getElementById('tribe');
@@ -79,7 +87,7 @@
             let handler = PaystackPop.setup({
                 key: PAYSTACK_KEY,
                 email: document.getElementById('email').value,
-                amount: 500000, // 5000 Naira
+                amount: 500000, 
                 callback: function(response){
                     finalizeRegistration(response.reference);
                 }
@@ -101,10 +109,8 @@
                 paymentRef: ref
             };
 
-            // Post to Sheets
             await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
 
-            // Wait 3 seconds then fetch the Real ID
             setTimeout(async () => {
                 const res = await fetch(`${SCRIPT_URL}?getRealID=${ref}`);
                 const result = await res.json();
