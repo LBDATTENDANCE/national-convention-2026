@@ -57,14 +57,19 @@
         </div>
 
         <div id="successCard" class="hidden ticket-card">
-            <h2 style="color: #059669; font-weight: bold; font-size: 1.5rem;">Registration Confirmed!</h2>
-            <p style="color: #6b7280; margin-bottom: 1.5rem;">Screenshot this for Convention Entry</p>
-            
-            <div class="id-display">
-                <p style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Your Unique ID</p>
-                <div id="displayID" style="font-size: 1.5rem; font-family: monospace; font-weight: bold; color: #1f2937; margin-bottom: 1rem;">---</div>
-                <svg id="barcode" style="margin: 0 auto;"></svg>
-            </div>
+    <h2 style="color: #059669; font-weight: bold; font-size: 1.5rem;">Registration Confirmed!</h2>
+    <p style="color: #6b7280; margin-bottom: 1.5rem;">Please present this ticket at the entrance</p>
+    
+    <div class="id-display">
+        <p style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Your Unique ID</p>
+        <div id="displayID" style="font-size: 1.5rem; font-family: monospace; font-weight: bold; color: #1f2937; margin-bottom: 1rem;">---</div>
+        <svg id="barcode" style="margin: 0 auto;"></svg>
+    </div>
+    
+    <button onclick="window.print()" class="print-btn">
+        <span>🖨️</span> PRINT THIS TICKET
+    </button>
+</div>
             
             <button onclick="location.reload()" style="margin-top: 2rem; color: #3b82f6; font-size: 0.875rem; background: none; border: none; cursor: pointer;">Register Another Person</button>
         </div>
