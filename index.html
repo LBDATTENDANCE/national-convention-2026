@@ -8,170 +8,113 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://js.paystack.co/v1/inline.js"></script>
     <style>
-        .barcode-container { display: none; }
-        .success-card { display: none; }
+        .loader { border-top-color: #3498db; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-100 min-h-screen">
 
-    <header class="bg-white border-b p-6 relative flex flex-col items-center text-center">
-        <div class="w-20 h-20 bg-gray-200 rounded-full mb-4 flex items-center justify-center border-2 border-dashed border-gray-400">
-            <span class="text-xs text-gray-500">LOGO</span>
-        </div>
-        <h1 class="text-2xl font-bold text-gray-800">LIVING BY DESIGN NATION</h1>
-        <h2 class="text-lg font-semibold text-blue-600">National Convention Registration</h2>
-        <p class="text-sm text-gray-500 italic">Please Register to secure a seat</p>
-        
-        <div id="currentDate" class="absolute bottom-2 right-4 text-xs font-mono text-gray-400"></div>
+    <header class="bg-white p-8 text-center shadow-sm relative">
+        <div class="w-20 h-20 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center font-bold text-blue-600">LOGO</div>
+        <h1 class="text-3xl font-bold">LIVING BY DESIGN NATION</h1>
+        <h2 class="text-xl text-blue-600 font-semibold">National Convention Registration</h2>
+        <p class="text-gray-500 italic">Please Register to secure a seat</p>
+        <div id="dateDisp" class="absolute bottom-2 right-4 text-xs font-mono text-gray-400"></div>
     </header>
 
-    <main class="max-w-xl mx-auto p-6 mt-6">
-        
-        <form id="regForm" class="bg-white p-8 rounded-xl shadow-lg space-y-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Full Name</label>
-                <input type="text" id="fullName" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Email</label>
-                    <input type="email" id="email" required class="w-full border p-2 rounded">
+    <main class="max-w-lg mx-auto p-4">
+        <div id="formContainer" class="bg-white p-8 rounded-2xl shadow-xl mt-6">
+            <form id="regForm" class="space-y-4">
+                <input type="text" id="fullName" placeholder="Full Name" required class="w-full border p-3 rounded-lg">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="email" id="email" placeholder="Email" required class="w-full border p-3 rounded-lg">
+                    <input type="tel" id="phone" placeholder="Phone" required class="w-full border p-3 rounded-lg">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Phone</label>
-                    <input type="tel" id="phone" required class="w-full border p-2 rounded">
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium mb-1">Colony</label>
-                <select id="colony" required class="w-full border p-2 rounded">
+                <select id="colony" required class="w-full border p-3 rounded-lg">
                     <option value="">-- Select Colony --</option>
-                    <option>Partnership</option>
-                    <option>Apprenticeship</option>
-                    <option>Relationship</option>
-                    <option>Citizenship</option>
-                    <option>Entrepreneurship</option>
-                    <option>Leadership</option>
+                    <option>Partnership</option><option>Apprenticeship</option>
+                    <option>Relationship</option><option>Citizenship</option>
+                    <option>Entrepreneurship</option><option>Leadership</option>
                     <option>Stewardship</option>
                 </select>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Hub</label>
-                    <select id="hub" required class="w-full border p-2 rounded"></select>
+                <div class="grid grid-cols-2 gap-4">
+                    <select id="hub" required class="border p-3 rounded-lg"></select>
+                    <select id="tribe" required class="border p-3 rounded-lg"></select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Tribe</label>
-                    <select id="tribe" required class="w-full border p-2 rounded"></select>
-                </div>
-            </div>
-
-            <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">
-                PAY TO REGISTER SEAT
-            </button>
-        </form>
-
-        <div id="successCard" class="success-card bg-white p-8 rounded-xl shadow-2xl text-center border-t-8 border-green-500">
-            <div class="text-green-500 text-5xl mb-4">✅</div>
-            <h2 class="text-2xl font-bold">Registration Successful!</h2>
-            <p class="text-gray-600 mb-6">Screenshot this ticket for entry.</p>
-            
-            <div class="bg-gray-100 p-4 rounded-lg inline-block">
-                <p class="text-sm text-gray-500 uppercase tracking-widest">Attendee ID</p>
-                <h3 id="displayID" class="text-xl font-mono font-bold text-blue-800">---</h3>
-                <svg id="barcode" class="mt-4 mx-auto"></svg>
-            </div>
-            
-            <button onclick="window.print()" class="mt-6 text-sm text-blue-500 underline">Print Ticket</button>
+                <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold text-lg hover:bg-blue-700">PAY TO REGISTER</button>
+            </form>
         </div>
 
+        <div id="loadingScreen" class="hidden text-center p-10">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mx-auto mb-4"></div>
+            <p>Processing Payment & Generating Ticket...</p>
+        </div>
+
+        <div id="successCard" class="hidden bg-white p-8 rounded-2xl shadow-2xl mt-6 text-center border-t-8 border-green-500">
+            <h2 class="text-2xl font-bold text-green-600">Registration Confirmed!</h2>
+            <p class="text-gray-500 mb-6">Screenshot this for Convention Entry</p>
+            <div class="bg-gray-50 p-6 rounded-xl border">
+                <p class="text-xs text-gray-400 uppercase tracking-widest">Your Unique ID</p>
+                <div id="displayID" class="text-2xl font-mono font-bold text-gray-800 mb-4">---</div>
+                <svg id="barcode" class="mx-auto"></svg>
+            </div>
+            <button onclick="location.reload()" class="mt-8 text-blue-500 text-sm font-medium">Register Another Person</button>
+        </div>
     </main>
 
     <script>
-        // 1. SET DATE
-        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        const SCRIPT_URL = "YOUR_WEB_APP_URL";
+        const PAYSTACK_KEY = "pk_test_YOUR_KEY";
 
-        // 2. POPULATE HUBS AND TRIBES
-        const hubSelect = document.getElementById('hub');
-        for (let i = 1; i <= 31; i++) {
-            let opt = document.createElement('option');
-            opt.value = i; opt.innerText = "Hub " + i;
-            hubSelect.appendChild(opt);
-        }
+        document.getElementById('dateDisp').innerText = new Date().toDateString();
 
-        const tribeSelect = document.getElementById('tribe');
-        for (let i = 1; i <= 72; i++) {
-            let opt = document.createElement('option');
-            opt.value = i; opt.innerText = "Tribe " + i;
-            tribeSelect.appendChild(opt);
-        }
+        // Populate Hubs (1-31) and Tribes (1-72)
+        const hSelect = document.getElementById('hub');
+        for(let i=1; i<=31; i++){ hSelect.options.add(new Option(`Hub ${i}`, i)); }
+        const tSelect = document.getElementById('tribe');
+        for(let i=1; i<=72; i++){ tSelect.options.add(new Option(`Tribe ${i}`, i)); }
 
-        // 3. PAYMENT & SUBMISSION
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzA--mA4W4HYHsFDXszrltwU5bgGBa-YWl5R6McyafxaNFDbBQwT65DrRdtML0odkHI/exec"; 
-
-        document.getElementById('regForm').addEventListener('submit', function(e) {
+        document.getElementById('regForm').onsubmit = function(e){
             e.preventDefault();
-            
-            // Initiate Paystack (Replace Public Key with yours)
             let handler = PaystackPop.setup({
-                key: 'pk_test_91f991c422aa16b731c14cfac90911e582c23544', 
+                key: PAYSTACK_KEY,
                 email: document.getElementById('email').value,
-                amount: 500000, // Amount in Kobo (e.g., 500000 = 5000 Naira)
-                currency: "NGN",
-                callback: function(response) {
-                    processRegistration(response.reference);
-                },
-                onClose: function() {
-                    alert('Transaction cancelled.');
+                amount: 500000, // 5000 Naira
+                callback: function(response){
+                    finalizeRegistration(response.reference);
                 }
             });
             handler.openIframe();
-        });
+        };
 
-        function processRegistration(payRef) {
-            const formData = {
+        async function finalizeRegistration(ref) {
+            document.getElementById('formContainer').classList.add('hidden');
+            document.getElementById('loadingScreen').classList.remove('hidden');
+
+            const payload = {
                 fullName: document.getElementById('fullName').value,
                 email: document.getElementById('email').value,
                 phone: document.getElementById('phone').value,
                 colony: document.getElementById('colony').value,
                 hub: document.getElementById('hub').value,
                 tribe: document.getElementById('tribe').value,
-                paymentRef: payRef
+                paymentRef: ref
             };
 
-            // Send to Google Sheets
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors', // Critical for Google Apps Script
-                body: JSON.stringify(formData)
-            }).then(() => {
-                // Since 'no-cors' doesn't return the body, we need a slight delay
-                // and then show the user experience. 
-                // In a perfect world, we'd use a small GET check to get the ID, 
-                // but for now, let's show the success screen.
-                showSuccess(formData);
-            });
-        }
+            // Post to Sheets
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
 
-        function showSuccess(data) {
-            document.getElementById('regForm').style.display = 'none';
-            document.getElementById('successCard').style.display = 'block';
-
-            // Reconstruct ID for display (matches backend logic)
-            const id = `${data.colony.substring(0,3).toUpperCase()}-H${data.hub}-T${data.tribe}-NEW`;
-            document.getElementById('displayID').innerText = id;
-
-            // Generate Barcode
-            JsBarcode("#barcode", id, {
-                format: "CODE128",
-                lineColor: "#000",
-                width: 2,
-                height: 50,
-                displayValue: false
-            });
+            // Wait 3 seconds then fetch the Real ID
+            setTimeout(async () => {
+                const res = await fetch(`${SCRIPT_URL}?getRealID=${ref}`);
+                const result = await res.json();
+                
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('successCard').classList.remove('hidden');
+                document.getElementById('displayID').innerText = result.uniqueID;
+                
+                JsBarcode("#barcode", result.uniqueID, { format: "CODE128", width: 2, height: 60, displayValue: false });
+            }, 3000);
         }
     </script>
 </body>
