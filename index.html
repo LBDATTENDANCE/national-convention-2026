@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>National Convention Registration</title>
+    <title>Registration | LBD Nation</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://js.paystack.co/v1/inline.js"></script>
@@ -11,66 +11,73 @@
 <body>
 
     <header>
-    <div class="logo-container">
-        <img src="https://i0.wp.com/lbdnation.org/wp-content/uploads/2024/06/LBD_LOGO_HORIZONTAL.png?w=446&ssl=1" alt="LBD Nation Logo">
-    </div>
-    
-    <h1 style="margin:0; font-size: 1.5rem;">LIVING BY DESIGN NATION</h1>
-    <h2 style="color:#2563eb; margin:5px 0">National Convention Registration</h2>
-    <p style="color:#6b7280; font-style:italic">Please Register to secure a seat</p>
-    <div id="dateDisp" style="position:absolute; bottom:10px; right:20px; font-size:12px; color:#9ca3af"></div>
-</header>
+        <div class="logo-circle">
+            <img src="https://i0.wp.com/lbdnation.org/wp-content/uploads/2024/06/LBD_LOGO_HORIZONTAL.png?w=446&ssl=1" alt="Logo">
+        </div>
+        <h1>LIVING BY DESIGN NATION</h1>
+        <h2>National Convention Registration</h2>
+        <p style="color:#64748b; font-size:0.9rem; font-style:italic">Please Register to secure a seat</p>
+        <div id="dateDisp" style="position:absolute; bottom:10px; right:20px; font-size:0.7rem; color:#94a3b8"></div>
+    </header>
 
-    <main style="max-width:500px; margin:auto; padding:20px">
+    <div class="container">
         <div id="formContainer" class="form-box">
             <form id="regForm">
                 <input type="text" id="fullName" placeholder="Full Name" required>
                 <div class="grid-2">
-                    <input type="email" id="email" placeholder="Email" required>
+                    <input type="email" id="email" placeholder="Email Address" required>
                     <input type="tel" id="phone" placeholder="Phone Number" required>
                 </div>
+                
                 <select id="colony" required>
-                    <option value="">-- Select Colony --</option>
+                    <option value="" disabled selected>-- Select Colony --</option>
                     <option>Partnership</option><option>Apprenticeship</option>
                     <option>Relationship</option><option>Citizenship</option>
                     <option>Entrepreneurship</option><option>Leadership</option>
                     <option>Stewardship</option>
                 </select>
+
                 <div class="grid-2">
-                    <select id="hub" required></select>
-                    <select id="tribe" required></select>
+                    <select id="hub" required>
+                        <option value="" disabled selected>-- Select Hub --</option>
+                    </select>
+                    <select id="tribe" required>
+                        <option value="" disabled selected>-- Select Tribe --</option>
+                    </select>
                 </div>
+                
                 <button type="submit" class="btn-pay">PAY TO REGISTER</button>
             </form>
         </div>
 
-        <div id="loadingScreen" class="hidden" style="text-align:center; padding:40px">
+        <div id="loadingScreen" class="hidden" style="text-align:center; color:white;">
             <div class="loader"></div>
-            <p>Confirming Registration...</p>
+            <p>Finalizing your credentials...</p>
         </div>
 
         <div id="successCard" class="hidden ticket-card">
-            <h2 style="color:#059669">Registration Confirmed!</h2>
-            <p>Please present this at the entrance</p>
+            <h2 style="color: #059669; font-weight: 800; font-size: 1.5rem;">REGISTRATION SUCCESS!</h2>
+            <p style="color:#64748b; margin-bottom: 20px;">Present this ticket at the convention entrance.</p>
             <div class="id-display">
-                <p style="font-size:10px; color:#9ca3af">UNIQUE ID</p>
-                <div id="displayID" style="font-size:24px; font-weight:bold; margin-bottom:10px"></div>
-                <svg id="barcode"></svg>
+                <p style="font-size:0.7rem; color:#94a3b8; letter-spacing: 2px;">UNIQUE ATTENDEE ID</p>
+                <div id="displayID" style="font-size:1.8rem; font-weight:800; color:#1e293b; margin:10px 0;"></div>
+                <svg id="barcode" style="width: 100%; max-height: 80px;"></svg>
             </div>
-            <button onclick="window.print()" class="print-btn">PRINT THIS TICKET</button>
+            <button onclick="window.print()" class="print-btn">PRINT TICKET</button>
         </div>
-    </main>
+    </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzA--mA4W4HYHsFDXszrltwU5bgGBa-YWl5R6McyafxaNFDbBQwT65DrRdtML0odkHI/exec";
-        const PAYSTACK_KEY = "pk_test_91f991c422aa16b731c14cfac90911e582c23544";
+        const SCRIPT_URL = "YOUR_WEB_APP_URL";
+        const PAYSTACK_KEY = "pk_test_YOUR_KEY";
 
         document.getElementById('dateDisp').innerText = new Date().toDateString();
 
+        // Populate Dropdowns
         const h = document.getElementById('hub');
-        for(let i=1;i<=31;i++){ h.options.add(new Option(`Hub ${i}`, i)); }
+        for(let i=1; i<=31; i++){ h.options.add(new Option(`Hub ${i}`, i)); }
         const t = document.getElementById('tribe');
-        for(let i=1;i<=72;i++){ t.options.add(new Option(`Tribe ${i}`, i)); }
+        for(let i=1; i<=72; i++){ t.options.add(new Option(`Tribe ${i}`, i)); }
 
         document.getElementById('regForm').onsubmit = function(e){
             e.preventDefault();
@@ -106,7 +113,7 @@
                 document.getElementById('successCard').classList.remove('hidden');
                 document.getElementById('displayID').innerText = result.uniqueID;
                 JsBarcode("#barcode", result.uniqueID, { format: "CODE128", width: 2, height: 50, displayValue: false });
-            }, 3000);
+            }, 3500);
         }
     </script>
 </body>
